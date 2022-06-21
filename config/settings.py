@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'social_django',
+
+    'authapp',
     'mainapp',
 ]
 
@@ -65,6 +68,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'mainapp.context_processor.my_context_processor',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -128,3 +133,39 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+
+AUTH_USER_MODEL = 'authapp.User'
+
+LOGIN_REDIRECT_URL = 'mainapp:index'
+LOGOUT_REDIRECT_URL = 'mainapp:index'
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+AUTHENTICATION_BACKENDS = (
+    'authapp.auth.EmailAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.yandex.YaruOAuth2',
+    'social_core.backends.vk.VKOAuth2',
+)
+
+# from django.contrib.auth.backends
+# from social_django.urls
+
+SOCIAL_AUTH_GITHUB_KEY = ''
+
+SOCIAL_AUTH_GITHUB_SECRET = ''
+
+SOCIAL_AUTH_YARU_KEY = ''
+
+SOCIAL_AUTH_YARU_SECRET = ''
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = ''
+
+SOCIAL_AUTH_VK_OAUTH2_SECRET = ''
+
+SOCIAL_AUTH_VK_APP_USER_MODE = 2
