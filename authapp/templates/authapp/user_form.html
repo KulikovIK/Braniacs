@@ -1,0 +1,44 @@
+{% extends 'authapp/base.html' %}
+{% load crispy_forms_tags %} 
+{% load static %} 
+{% block content %}
+
+<form method="post" class="mt-2" enctype="multipart/form-data">
+
+  {% csrf_token %}
+
+  {{ form|crispy }}
+
+  <p>  
+    <button type="submit" class="btn btn-primary btn-block">
+      Зарегистрироваться
+    </button>
+  </p>
+</form>
+
+<p>
+  <div class="row justify-content-between">
+    <div class="col">
+      <a href="{% url 'authapp:login' %}"><small>Войти</small></a>
+    </div>
+    <div class="col">
+      <a href="#"><small>Забыли пароль?</small></a>
+    </div>
+  </div>
+</p>
+
+{% endblock content %} 
+
+{% block js_script %}
+
+<script>
+  $(document).ready(function () {
+  {% if messages %}
+  // Toasts
+  $(".toast").toast({ delay: 5000 });
+  $(".toast").toast("show");
+  {% endif %}
+  });
+</script>
+
+{% endblock js_script %}
