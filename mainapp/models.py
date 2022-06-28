@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 NULLABLE = {'blank': True, 'null': True}
 
@@ -20,10 +21,11 @@ class BaseModel(models.Model):
         # важный флаг для исключения дублирования
         abstract = True
 
+
 class ObjectsManager(models.Manager):
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=False)
+        return super().get_queryset().all()
 
 
 class News(BaseModel):
@@ -43,6 +45,7 @@ class News(BaseModel):
         verbose_name = 'новость'
         verbose_name_plural = 'новости'
         ordering = BaseModel.Meta.ordering
+
 
 class Course(BaseModel):
     objects = ObjectsManager()
@@ -94,3 +97,44 @@ class CoursesTeacher(BaseModel):
     def __str__(self) -> str:
         return f'{self.pk} | {self.name_second} {self.name_first}'
 
+
+class CourseFeedback(BaseModel):
+    RATING_FIVE = 5
+
+    RATINGS = (
+        (RATING_FIVE, '⭐⭐⭐⭐⭐'),
+        (4, '⭐⭐⭐⭐'),
+        (3, '⭐⭐⭐'),
+        (2, '⭐⭐'),
+        (1, '⭐'),
+    )
+
+    course = models.ForeignKey(
+        Course, 
+        verbose_name='Курс', 
+        on_delete=models.CASCADE
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE, 
+    )
+
+    rating = models.SmallIntegerField(
+        verbose_name='Рейтинг',
+        choices=RATINGS,
+        default=RATING_FIVE,
+    )
+
+    feedback = models.TextField(
+        verbose_name='Отзыв', 
+        default='Без отзыва',
+    )
+
+    class Meta:
+        verbose_name = 'отзыв'
+        verbose_name_plural = 'отзовы'
+
+    def __str__(self) -> str:
+        return f'Отзыв на {self.course} от {self.user}'

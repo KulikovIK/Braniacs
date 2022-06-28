@@ -1,17 +1,22 @@
 from datetime import datetime
 from urllib import request, response
-from django.shortcuts import redirect, render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, DetailView
+from mainapp.models import Course, Lesson, News, CoursesTeacher, CourseFeedback
+from mainapp.forms import CourseFeedbackForm
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.template.loader import render_to_string
 
 
 class MainView(TemplateView):
     template_name = 'mainapp/index.html'
 
+
 class ContacntsView(TemplateView):
     template_name = 'mainapp/contacts.html'
-
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -38,48 +43,96 @@ class ContacntsView(TemplateView):
         ]
         return context_data
 
-class CoursesView(TemplateView):
+
+class CoursesView(ListView):
     template_name = 'mainapp/courses_list.html'
+    model = Course
+
+
+class CourseDetailView(TemplateView):
+    template_name = 'mainapp/course_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['course_object'] = get_object_or_404(
+            Course, pk=self.kwargs.get('pk'))
+        context_data['lessons'] = Lesson.objects.filter(
+            course=context_data['course_object'])
+        context_data['teachers'] = CoursesTeacher.objects.filter(
+            courses=context_data['course_object'])
+        context_data['feedback_list'] = CourseFeedback.objects.filter(
+            course=context_data['course_object'])
+
+        if self.request.user.is_authenticated:
+            if not CourseFeedback.objects.filter(course=context_data['course_object'], user=self.request.user).count():
+                context_data['feedback_form'] = CourseFeedbackForm(
+                    course=context_data['course_object'],
+                    user=self.request.user
+                )
+
+        return context_data
+
+
+class CourseFeedbackCreateView(CreateView):
+    model = CourseFeedback
+    form_class = CourseFeedbackForm
+
+    def form_valid(self, form):
+        self.object = form.save()
+        rendered_template = render_to_string(
+            "includes/feedback_card.html", 
+            context={'item': self.object}
+        )
+        return JsonResponse({'card': rendered_template})
+
 
 class DocsView(TemplateView):
     template_name = 'mainapp/doc_site.html'
 
+
 class LoginView(TemplateView):
     template_name = 'mainapp/login.html'
 
-class NewsView(TemplateView):
-    template_name = 'mainapp/news.html'
 
-    def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        context_data['object_list'] = [
-            {
-                'title': 'Новость 1',
-                'preview': 'Превью новости 1',
-                'date': datetime.now()
-            }, {
-                'title': 'Новость 2',
-                'preview': 'Превью новости 2',
-                'date': '2022-01-01'
-            }, {
-                'title': 'Новость 3',
-                'preview': 'Превью новости 3',
-                'date': '2022-01-01'
-            }, {
-                'title': 'Новость 4',
-                'preview': 'Превью новости 4',
-                'date': '2022-01-01'
-            }, {
-                'title': 'Новость 1',
-                'preview': 'Превью новости 4',
-                'date': '2022-01-01'
-            }, 
-        ]
-        return context_data
+class NewsView(ListView):
+    model = News
+    paginate_by: int = 5
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
+
+class NewsDetailView(DetailView):
+    model = News
+
+    # def get_context_data(self, **kwargs):
+    #     context_data = super().get_context_data(**kwargs)
+    #     context_data['course_object'] = get_object_or_404(Course, pk=self.kwargs['pk'])
+
+    #     return context_data
+
+
+class NewsCreateView(CreateView, PermissionRequiredMixin):
+    model = News
+    fields = '__all__'
+    success_url = reverse_lazy('mainapp:news')
+    permission_required = ('mainapp:add_news', )
+
+
+class NewsUpdateView(UpdateView, PermissionRequiredMixin):
+    model = News
+    fields = '__all__'
+    success_url = reverse_lazy('mainapp:news')
+    permission_required = ('mainapp:change_news', )
+
+
+class NewsDeleteView(DeleteView, PermissionRequiredMixin):
+    model = News
+    success_url = reverse_lazy('mainapp:news')
+    permission_required = ('mainapp:delete_news', )
+
 
 class SearchView(View):
     def get(self, request):
         response = request.GET['param'].replace(' ', '+')
         return redirect(f'https://yandex.ru/search/?text={response}&lr=11219')
-    
-    

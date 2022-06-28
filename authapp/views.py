@@ -1,13 +1,12 @@
 from typing import Any, Optional
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
-from django.views.generic import TemplateView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import TemplateView, CreateView, UpdateView
 from authapp.models import User
+from authapp.forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
-
-# Create your views here.
 
 
 class MyLoginView(LoginView):
@@ -17,82 +16,24 @@ class MyLoginView(LoginView):
     }
 
 
-
-class RegisterView(TemplateView):
-    template_name = 'authapp/register.html'
-    extra_context = {
-        'title': 'Регистрация пользователя'
-    }
-
-    def post(self, request, *args, **kwargs):
-        try:
-            if all(
-                (
-                    request.POST.get('username'),
-                    request.POST.get('password1'),
-                    request.POST.get('password2'),
-                    request.POST.get('first_name'),
-                    request.POST.get('last_name'),
-                    request.POST.get(
-                        'password1') == request.POST.get('password2'),
-                )
-            ):
-                new_user = User.objects.create(
-                    username=request.POST.get('username'),
-                    first_name=request.POST.get('first_name'),
-                    last_name=request.POST.get('last_name'),
-                    age=request.POST.get(
-                        'age') if request.POST.get('age') else 0,
-                    avatar=request.FILES.get('avatar'),
-                    email=request.POST.get('email'),
-                )
-                new_user.set_password(request.POST.get('password1'),)
-                new_user.save()
-                messages.add_message(request, messages.SUCCESS,
-                                     'Регистрация прошла успешно')
-                return HttpResponseRedirect(reverse('authapp:login'))
-            else:
-                messages.add_message(request, messages.WARNING,
-                                     'Что-то пошло не так')
-                return HttpResponseRedirect(reverse('authapp:register'))
-
-        except Exception as ex:
-            messages.add_message(request, messages.WARNING,
-                                 'Что-то пошло не так')
-            return HttpResponseRedirect(reverse('authapp:register'))
+class RegisterView(CreateView):
+    model = User
+    form_class = CustomUserCreationForm
+    success_url: Optional[str] = reverse_lazy('authapp:login')
 
 
 class MyLogoutView(LogoutView):
     pass
 
 
-class EditView(TemplateView):
-    template_name = 'authapp/edit.html'
-    extra_context = {
-        'title': 'Редактирование пользователя'
-    }
+class EditView(UpdateView):
+    model = User
+    form_class = CustomUserChangeForm
+    template_name: str = 'authapp/edit.html'
 
-    def post(self, request, *args, **kwargs):
+    def get_object(self, queryset=None):
+        return self.request.user
 
-        if request.POST.get('username'):
-            request.user.username = request.POST.get('username')
-
-
-        if request.POST.get('first_name'):
-            request.user.first_name = request.POST.get('first_name')
-
-
-        if request.POST.get('last_name'):
-            request.user.last_name = request.POST.get('last_name')
-
-
-        if request.POST.get('age'):
-            request.user.age = request.POST.get('age')
-
-        if request.POST.get('email'):
-            request.user.email = request.POST.get('email')
-
-        request.user.save()
-
-        return HttpResponseRedirect(reverse('authapp:edit'))
-        
+    def get_success_url(self) -> str:
+        return reverse_lazy('authapp:edit')
+      
