@@ -170,3 +170,33 @@ SOCIAL_AUTH_VK_OAUTH2_SECRET = ''
 SOCIAL_AUTH_VK_APP_USER_MODE = 2
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOG_FILE = BASE_DIR / "log" / "main_log.log"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {
+            "format": "[%(asctime)s] %(levelname)s %(name)s (%(lineno)d) %(message)s"
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": LOG_FILE,
+            "formatter": "console"
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
+    },
+    "loggers": {
+        "django": {
+            "level": "INFO",
+            "handlers": ["file", "console"],
+        },
+    },
+}
