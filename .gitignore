@@ -22,3 +22,7 @@ __pycache__
 
 # PyCharm
 .idea
+
+# Othe
+log
+emails-tmp
