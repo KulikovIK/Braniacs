@@ -53,6 +53,7 @@
 
                         {% if user.is_superuser %}
                             <a class="dropdown-item" href="{% url 'admin:index' %}">Административный раздел</a>
+                            <a class="dropdown-item" href="{% url 'mainapp:logs_list' %}">Логи</a>
                         {% endif %}
                         
                         <div class="dropdown-divider"></div>
