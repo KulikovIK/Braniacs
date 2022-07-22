@@ -7,12 +7,13 @@ from authapp.models import User
 from authapp.forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
+from django.utils.translation import gettext_lazy as _
 
 
 class MyLoginView(LoginView):
     template_name = 'authapp/login.html'
     extra_context = {
-        'title': 'Вход пользователя'
+        'title': _('User login')
     }
 
 

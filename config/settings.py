@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -191,6 +192,13 @@ CACHES = {
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
 RESULT_BACKEND = 'redis://127.0.0.1:6379'
 
+# 500 ошибки прилетят сюда, даже с DEBUG = False!!
+# You must to be a good developer!
+
+# ADMINS = (
+#     ('email@email.com', 'Ilya')
+# )
+
 #  For real work
 # EMAIL_HOST = 'localhost'
 # EMAIL_PORT = 25
@@ -232,3 +240,5 @@ EMAIL_FILE_PATH = 'emails-tmp'
 #         },
 #     },
 # }
+
+LOCALE_PATHS = [BASE_DIR / 'locale']

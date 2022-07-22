@@ -32,8 +32,8 @@ class ContactsFeedbackForm(forms.Form):
     user_id = forms.IntegerField(widget=forms.HiddenInput)
     message_body = forms.CharField(
         widget=forms.Textarea,
-        help_text=_('Введите Ваше сообщение'),
-        label=_('Сообщение'),
+        help_text=_('enter your message'),
+        label=_('message'),
     )
 
     def __init__(self, *args, user=None, **kwargs):

@@ -17,7 +17,7 @@ urlpatterns = [
     path('courses/feedback/', views.CourseFeedbackCreateView.as_view(), name='course_feedback'),
 
     # News
-    path('news/', cache_page(360)(views.NewsView.as_view()), name='news'),
+    path('news/', views.NewsView.as_view(), name='news'),
     path('news/<int:pk>/detail/', views.NewsDetailView.as_view(), name='news_detail'),
     path('news/<int:pk>/delete/', views.NewsDeleteView.as_view(), name='news_delete'),
     path('news/<int:pk>/update/', views.NewsUpdateView.as_view(), name='news_update'),
