@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 <!doctype html>
 <html lang="ru">
@@ -33,14 +33,30 @@
             content
         {% endblock content %}
         
-        <h4>Вход через социальные сети</h4>
-        <p>
-          <div class="btn-group btn-block" role="group">
-            <a class="btn btn-primary" href="{% url 'social:begin' 'vk-oauth2' %}" role="button"><i class="fab fa-vk"></i></a>
-            <a class="btn btn-primary" href="{% url 'social:begin' 'github' %}" role="button"><i class="fab fa-github"></i></a>
-            <a class="btn btn-primary" href="{% url 'social:begin' 'yaru' %}" role="button"><i class="fab fa-yandex"></i></a>
-          </div>
-        </p>
+          <h4> {% translate "Login via social" %} </h4>
+          <p>
+            <div class="btn-group btn-block" role="group">
+              <a class="btn btn-primary" href="{% url 'social:begin' 'vk-oauth2' %}" role="button"><i class="fab fa-vk"></i></a>
+              <a class="btn btn-primary" href="{% url 'social:begin' 'github' %}" role="button"><i class="fab fa-github"></i></a>
+              <a class="btn btn-primary" href="{% url 'social:begin' 'yaru' %}" role="button"><i class="fab fa-yandex"></i></a>
+            </div>
+            <div class="btn-group btn-block">
+              <div class="col p-0 border-right">
+                  <form action="{% url 'set_language' %}" method="post">
+                      {% csrf_token %}
+                      <input name="language" type="hidden" value="ru">
+                      <button type="submit" class="btn btn-link">🇷🇺</button>
+                  </form>
+              </div>
+              <div class="col p-0">
+                  <form action="{% url 'set_language' %}" method="post">
+                      {% csrf_token %}
+                      <input name="language" type="hidden" value="en">
+                      <button type="submit" class="btn btn-link">🇬🇧</button>
+                  </form>
+              </div>
+            </div>
+          </p>
 
         </div>
     </div>

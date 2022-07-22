@@ -1,29 +1,35 @@
 {% extends 'authapp/base.html' %}
 
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 
     <form method="post">
       {% csrf_token %}
       <p>
-        <input id="id_username" class="form-control" type="text" name="username" placeholder="Имя пользователя"
+        <input id="id_username" class="form-control" type="text" name="username" placeholder="{% translate "User name" %}"
           required="" autofocus="">
       </p>
       <p>
-        <input id="id_password" class="form-control" type="password" name="password" placeholder="Пароль" required="">
+        <input id="id_password" class="form-control" type="password" name="password" placeholder="{% translate "password" %}" required="">
       </p>
       <p>
-        <button type="submit" class="btn btn-primary btn-block">Войти</button>
+        <button type="submit" class="btn btn-primary btn-block">
+          {% translate "Login" %}
+        </button>
       </p>
     </form>
     <p>
       <div class="row justify-content-between">
         <div class="col">
-          <a href="{% url 'authapp:register' %}"><small>Регистрация</small></a>
+          <a href="{% url 'authapp:register' %}">
+            <small> {% translate "Registration" %} </small>
+          </a>
         </div>
         <div class="col">
-          <a href="#"><small>Забыли пароль?</small></a>
+          <a href="#">
+            <small> {% translate "Forgot your password?" %} </small>
+          </a>
         </div>
       </div>
     </p>
