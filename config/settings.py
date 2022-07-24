@@ -10,11 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -23,9 +25,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-y!e4^u4b7ouh72xl_4oh3!6(qja^$qprf7gq%@)uhg4y#tntaq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.getenv('DEBUG') == 'True' else False
 
 ALLOWED_HOSTS = ['*']
+
+ENV_TYPE = os.getenv('ENV_TYPE', 'prod')
 
 if DEBUG:
     INTERNAL_IPS = [
@@ -89,13 +93,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if ENV_TYPE == 'local':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'lms',
+            'USER': 'postgres',
+        }
+    }
 
 
 # Password validation
@@ -134,9 +146,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+if ENV_TYPE == 'local':
+    STATICFILES_DIRS = [
+        BASE_DIR / 'static',
+    ]
+else:
+    STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -163,19 +178,19 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-SOCIAL_AUTH_GITHUB_KEY = ''
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('GITHUB_KEY')
 
-SOCIAL_AUTH_GITHUB_SECRET = ''
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('GITHUB_SECRET')
 
-SOCIAL_AUTH_YARU_KEY = ''
+SOCIAL_AUTH_YARU_KEY = os.getenv('YARU_KEY')
 
-SOCIAL_AUTH_YARU_SECRET = ''
+SOCIAL_AUTH_YARU_SECRET = os.getenv('YARU_SECRET')
 
-SOCIAL_AUTH_VK_OAUTH2_KEY = ''
+SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('VK_OAUTH2_KEY')
 
-SOCIAL_AUTH_VK_OAUTH2_SECRET = ''
+SOCIAL_AUTH_VK_OAUTH2_SECRET = os.getenv('VK_OAUTH2_SECRET')
 
-SOCIAL_AUTH_VK_APP_USER_MODE = 2
+SOCIAL_AUTH_VK_APP_USER_MODE = int(os.getenv('VK_APP_USER_MODE'))
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
